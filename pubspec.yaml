@@ -83,11 +83,11 @@ dependencies:
   flutter_paystack:
     git:
       url: https://github.com/appmeetmighty/flutter_paystack.git
-  paytm:
-    git:
-      url: https://github.com/appmeetmighty/Paytm-All-in-one-flutter-sdk.git
 
-  # ✅ Braintree fix — plugin compatível
+  # ✅ PayTM — atualizado e compatível com Flutter moderno
+  paytm_allinonesdk: ^1.2.8
+
+  # ✅ Braintree — plugin compatível (remove o antigo quebrado)
   flutter_braintree_payment: ^1.0.2
 
   # PUSH NOTIFICATION
