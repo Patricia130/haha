@@ -4,7 +4,7 @@ pluginManagement {
         def properties = new Properties()
         file("local.properties").withInputStream { properties.load(it) }
         def flutterSdkPath = properties.getProperty("flutter.sdk")
-        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        assert flutterSdkPath != null : "flutter.sdk not set in local.properties"
         return flutterSdkPath
     }
     settings.ext.flutterSdkPath = flutterSdkPath()
@@ -18,18 +18,18 @@ pluginManagement {
     }
 }
 
-// ✅ Plugins – versões corrigidas e compatíveis com o Flutter e Codemagic
+// ✅ Plugins – versões totalmente compatíveis com Flutter, Kotlin 2.2.0 e Codemagic
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.2"
 
-    // ✅ Atualizado — Antes estava 8.1.0 (inválido)
+    // ✅ AGP Recomendada (mínimo 8.1.1 para Flutter)
     id "com.android.application" version "8.1.1" apply false
     id "com.android.library" version "8.1.1" apply false
 
-    // ✅ Kotlin compatível
-    id "org.jetbrains.kotlin.android" version "2.0.21" apply false
+    // ✅ Kotlin atualizado (necessário por causa do erro metadata 2.2.0)
+    id "org.jetbrains.kotlin.android" version "2.2.0" apply false
 
-    // Firebase & Google Services
+    // ✅ Firebase
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
     id("com.google.gms.google-services") version "4.4.1" apply false
 }
