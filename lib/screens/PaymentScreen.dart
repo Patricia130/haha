@@ -14,7 +14,7 @@ import 'package:flutterwave_standard_smart/flutterwave.dart';
 import 'package:flutterwave_standard_smart/view/view_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_fatoorah/my_fatoorah.dart';
-import 'package:paytm/paytm.dart';
+// import 'package:paytm/paytm.dart'; // REMOVIDO (incompatível)
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../main.dart';
@@ -54,9 +54,8 @@ class PaymentScreenState extends State<PaymentScreen> {
       payTabsProfileId,
       payTabsServerKey,
       payTabsClientKey,
-      myFatoorahToken,
-      paytmMerchantId,
-      paytmMerchantKey;
+      myFatoorahToken;
+  // paytm variables removed because plugin is incompatible
 
   String? razorKey;
   bool isTestType = true;
@@ -99,7 +98,7 @@ class PaymentScreenState extends State<PaymentScreen> {
     await getPaymentList().then((value) {
       appStore.setLoading(false);
       paymentList.addAll(value.data!);
-      selectedPaymentType = paymentList.first.type;
+      selectedPaymentType = paymentList.isNotEmpty ? paymentList.first.type : null;
       if (paymentList.isNotEmpty) {
         paymentList.forEach((element) {
           if (element.type == PAYMENT_TYPE_STRIPE) {
@@ -113,7 +112,7 @@ class PaymentScreenState extends State<PaymentScreen> {
             payPalTokenizationKey = element.isTest == 1 ? element.testValue!.tokenizationKey : element.liveValue!.tokenizationKey;
           } else if (element.type == PAYMENT_TYPE_FLUTTERWAVE) {
             flutterWavePublicKey = element.isTest == 1 ? element.testValue!.publicKey : element.liveValue!.publicKey;
-            flutterWaveSecretKey = element.isTest == 1 ? element.testValue!.secretKey : element.liveValue!.secretKey;
+            flutterWaveSecretKey = element.isTest == 1 ? element.testValue!.secretKey : element.liveValue!.secretValue ?? element.liveValue!.secretKey;
             flutterWaveEncryptionKey = element.isTest == 1 ? element.testValue!.encryptionKey : element.liveValue!.encryptionKey;
           } else if (element.type == PAYMENT_TYPE_PAYTABS) {
             payTabsProfileId = element.isTest == 1 ? element.testValue!.profileId : element.liveValue!.profileId;
@@ -121,10 +120,8 @@ class PaymentScreenState extends State<PaymentScreen> {
             payTabsServerKey = element.isTest == 1 ? element.testValue!.serverKey : element.liveValue!.serverKey;
           } else if (element.type == PAYMENT_TYPE_MYFATOORAH) {
             myFatoorahToken = element.isTest == 1 ? element.testValue!.accessToken : element.liveValue!.accessToken;
-          } else if (element.type == PAYMENT_TYPE_PAYTM) {
-            paytmMerchantId = element.isTest == 1 ? element.testValue!.merchantId : element.liveValue!.merchantId;
-            paytmMerchantKey = element.isTest == 1 ? element.testValue!.merchantKey : element.liveValue!.merchantKey;
           }
+          // PayTM branch removed
         });
       }
       setState(() {});
@@ -173,7 +170,7 @@ class PaymentScreenState extends State<PaymentScreen> {
     toast("EXTERNAL_WALLET: " + response.walletName!);
   }
 
-  /// StripPayment
+  /// Stripe Payment
   void stripePay() async {
     Map<String, String> headers = {
       HttpHeaders.authorizationHeader: 'Bearer ${stripPaymentKey.validate()}',
@@ -289,74 +286,6 @@ class PaymentScreenState extends State<PaymentScreen> {
     }
     return 'ChargedFrom${platform}_${DateTime.now().millisecondsSinceEpoch}';
   }
-
-  /// Paypal Payment
-  // void payPalPayment() async {
-  //   appStore.setLoading(true);
-  //   // var request = BraintreeDropInRequest(
-  //   //   tokenizationKey: payPalTokenizationKey ?? "",
-  //   //   collectDeviceData: true,
-  //   //   vaultManagerEnabled: true,
-  //   //   requestThreeDSecureVerification: true,
-  //   //   paypalRequest: BraintreePayPalRequest(amount: widget.amount.toString(), displayName: sharedPref.getString(USER_NAME), currencyCode: appStore.currencyName.toUpperCase()),
-  //   //   cardEnabled: true,
-  //   // );
-  //   // final result = await BraintreeDropIn.start(request);
-  //   var request = BraintreeDropInRequest(
-  //     tokenizationKey: payPalTokenizationKey,
-  //     collectDeviceData: true,
-  //     vaultManagerEnabled: true,
-  //     requestThreeDSecureVerification: true,
-  //     email: sharedPref.getString(USER_EMAIL).validate(),
-  //     googlePaymentRequest: BraintreeGooglePaymentRequest(
-  //       totalPrice: widget.amount.toString(),
-  //       currencyCode: appStore.currencyCode,
-  //       billingAddressRequired: false,
-  //     ),
-  //     applePayRequest: BraintreeApplePayRequest(
-  //         currencyCode: appStore.currencyCode,
-  //         supportedNetworks: [
-  //           ApplePaySupportedNetworks.visa,
-  //           ApplePaySupportedNetworks.masterCard,
-  //           // ApplePaySupportedNetworks.amex,
-  //           // ApplePaySupportedNetworks.discover,
-  //         ],
-  //         countryCode: 'US',
-  //         merchantIdentifier: '',
-  //         displayName: sharedPref.getString(USER_NAME).validate(),
-  //         paymentSummaryItems: []),
-  //     paypalRequest: BraintreePayPalRequest(
-  //       amount: widget.amount.toString(),
-  //       displayName: sharedPref.getString(USER_NAME).validate(),
-  //     ),
-  //     cardEnabled: true,
-  //   );
-  //   final result = await BraintreeDropIn.start(request);
-  //   if (result != null) {
-  //     appStore.setLoading(false);
-  //     paymentConfirm();
-  //   } else {
-  //     appStore.setLoading(false);
-  //   }
-  // }
-  // void payPalPayment() async {
-  //   appStore.setLoading(true);
-  //   var request = BraintreeDropInRequest(
-  //     tokenizationKey: payPalTokenizationKey ?? "",
-  //     collectDeviceData: true,
-  //     vaultManagerEnabled: true,
-  //     requestThreeDSecureVerification: true,
-  //     paypalRequest: BraintreePayPalRequest(amount: widget.amount.toString(), displayName: sharedPref.getString(USER_NAME), currencyCode: appStore.currencyName.toUpperCase()),
-  //     cardEnabled: true,
-  //   );
-  //   final result = await BraintreeDropIn.start(request);
-  //   if (result != null) {
-  //     appStore.setLoading(false);
-  //     paymentConfirm();
-  //   } else {
-  //     appStore.setLoading(false);
-  //   }
-  // }
 
   /// FlutterWave Payment
   void flutterWaveCheckout() async {
@@ -482,68 +411,6 @@ class PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  /// PayTm Payment
-  void paytmPayment() async {
-    setState(() {
-      loading = true;
-    });
-
-    String orderId = DateTime.now().millisecondsSinceEpoch.toString();
-
-    String callBackUrl = (isTestType ? 'https://securegw-stage.paytm.in' : 'https://securegw.paytm.in') + '/theia/paytmCallback?ORDER_ID=' + orderId;
-
-    var url = 'https://desolate-anchorage-29312.herokuapp.com/generateTxnToken';
-
-    var body = json.encode({
-      "mid": paytmMerchantId,
-      "key_secret": paytmMerchantKey,
-      "website": isTestType ? "WEBSTAGING" : "DEFAULT",
-      "orderId": orderId,
-      "amount": widget.amount.toString(),
-      "callbackUrl": callBackUrl,
-      "custId": sharedPref.getInt(USER_ID).toString(),
-      "testing": isTestType ? 0 : 1
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        body: body,
-        headers: {'Content-type': "application/json"},
-      );
-
-      String txnToken = response.body;
-
-      var paytmResponse = Paytm.payWithPaytm(
-        mId: paytmMerchantId!,
-        orderId: orderId,
-        txnToken: txnToken,
-        txnAmount: widget.amount.toString(),
-        callBackUrl: callBackUrl,
-        staging: isTestType,
-        appInvokeEnabled: false,
-      );
-
-      paytmResponse.then((value) {
-        setState(() {
-          loading = false;
-          if (value['error']) {
-            toast(language.transactionFailed);
-          } else {
-            if (value['response'] != null) {
-              toast(language.transactionSuccessful);
-              if (value['response']['STATUS'] == 'TXN_SUCCESS') {
-                paymentConfirm();
-              }
-            }
-          }
-        });
-      });
-    } catch (e) {
-      log(e);
-    }
-  }
-
   @override
   void setState(fn) {
     if (mounted) super.setState(fn);
@@ -625,8 +492,9 @@ class PaymentScreenState extends State<PaymentScreen> {
                 // mercadoPagoPayment();
               } else if (selectedPaymentType == PAYMENT_TYPE_MYFATOORAH) {
                 myFatoorahPayment();
-              } else if (selectedPaymentType == PAYMENT_TYPE_PAYTM) {
-                paytmPayment();
+              } else {
+                // PayTM removed or unsupported; no-op to prevent crash.
+                toast(language.paymentMethodNotAvailable);
               }
             },
           ),
